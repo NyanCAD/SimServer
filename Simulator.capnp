@@ -39,3 +39,6 @@ struct File {
     contents @1 :Data;
 }
 
+# Implementations
+
+interface Xyce extends(Simulator(Run)) { }
