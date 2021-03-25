@@ -7,7 +7,12 @@ A Cap'n Proto interface for running simulations over the network.
 Most simulators have a command-line interface that takes source files and spits out data files.
 Most also have a C API to do more tight integration.
 
-SimServer is an abstraction over the C API of various simulators that allows you to offer tighter integration with multiple simulators.
+SimServer is an abstraction over the C API of various simulators that allows you to offer tighter integration with multiple simulators. For example:
+
+* Results as data structure instead of obscure file formats
+* Progress updates
+* Streaming results
+* Simulator subclasses to access simulator-specific features
 
 ## Why
 
