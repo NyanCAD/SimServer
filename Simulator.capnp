@@ -12,7 +12,11 @@ interface Run {
 }
 
 interface Tran {
-    tran @0 (start :Float64, stop :Float64) -> (result :Result);
+    tran @0 (step :Float64, stop :Float64, start :Float64) -> (result :Result);
+}
+
+interface Op {
+    op @0 () -> (result :Result);
 }
 
 interface Result {
@@ -42,3 +46,6 @@ struct File {
 # Implementations
 
 interface Xyce extends(Simulator(Run)) { }
+
+interface NgspiceCommands extends(Run, Tran, Op) {}
+interface Ngspice extends(Simulator(NgspiceCommands)) { }
