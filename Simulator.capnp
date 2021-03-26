@@ -12,17 +12,25 @@ interface Run {
 }
 
 interface Tran {
-    tran @0 (step :Float64, stop :Float64, start :Float64) -> (result :Result);
+    tran @0 (step :Float64, stop :Float64, start :Float64, vectors :List(Text)) -> (result :Result);
 }
 
 interface Op {
-    op @0 () -> (result :Result);
+    op @0 (vectors :List(Text)) -> (result :Result);
+}
+
+interface Ac {
+    ac @0 (mode :AcType, num :UInt64, fstart :Float64, fstop :Float64, vectors :List(Text)) -> (result :Result);
+}
+
+enum AcType {
+    lin @0;
+    dec @1;
+    oct @2;
 }
 
 interface Result {
-    read @0 (length :UInt64) -> (data :List(Vector));
-    readTime @1 (seconds :Float64) -> (data :List(Vector));
-    readAll @2 () -> (data :List(Vector));
+    read @0 () -> (scale :Text, more :Bool, data :List(Vector));
 }
 
 struct Vector {
@@ -47,5 +55,5 @@ struct File {
 
 interface Xyce extends(Simulator(Run)) { }
 
-interface NgspiceCommands extends(Run, Tran, Op) {}
+interface NgspiceCommands extends(Run, Tran, Op, Ac) {}
 interface Ngspice extends(Simulator(NgspiceCommands)) { }
