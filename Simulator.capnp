@@ -45,11 +45,7 @@ struct File {
 
 # Implementations
 
-<<<<<<< HEAD
-interface Xyce extends(Simulator(Run)) { }
-=======
 interface Xyce extends(Simulator(Run)) { }
 
 interface NgspiceCommands extends(Run, Tran, Op) {}
 interface Ngspice extends(Simulator(NgspiceCommands)) { }
->>>>>>> 82e4e6c210220e9508d808f069e2f9abd004e509
