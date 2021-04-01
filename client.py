@@ -41,22 +41,58 @@ def readAll(result):
     else:
         return df
 
+def take_args(q):
+    res = []
+    while q and q[0] not in {'ngspice', 'xyce', 'op', 'ac', 'tran', 'run'}:
+        res.append(q.popleft())
+    return res
+
 if __name__ == "__main__":
     import sys
-    sim = capnp.TwoPartyClient('localhost:5923').bootstrap().cast_as(api.Ngspice)
-    res = loadFiles(sim, *sys.argv[1:])
+    from collections import deque
 
-    df = readAll(res.commands.op().result)
-    print(df)
+    usage = f"usage: {sys.argv[0]} sim host:port file cmd args..."
 
-    df = readAll(res.commands.ac(api.AcType.dec, 10, 1, 1e6).result)
-    print(df)
-    fig, (ax1, ax2) = plt.subplots(nrows=2)
-    df.abs().plot(ax=ax1, loglog=True)
-    df.apply(np.angle).apply(np.rad2deg).plot(ax=ax2, logx=True)
+    args = deque(sys.argv[1:])
+    res = None
+    while args:
+        arg = args.popleft()
 
-    df = readAll(res.commands.tran(1e-6, 2e-3, 0, vectors=['@r1[i]']).result)
-    print(df)
-    df.plot()
+        if arg == "ngspice":
+            host = args.popleft()
+            file = args.popleft()
+            sim = capnp.TwoPartyClient(host).bootstrap().cast_as(api.Ngspice)
+            res = loadFiles(sim, file)
+        elif arg == "xyce":
+            host = args.popleft()
+            file = args.popleft()
+            sim = capnp.TwoPartyClient(host).bootstrap().cast_as(api.Xyce)
+            res = loadFiles(sim, file)
+        elif arg == "op":
+            df = readAll(res.commands.op().result)
+            print(df)
+        elif arg == "ac":
+            fnum = float(args.popleft())
+            fstart = float(args.popleft())
+            fstop = float(args.popleft())
+            vecs = take_args(args)
+            df = readAll(res.commands.ac(api.AcType.dec, fnum, fstart, fstop, vectors=vecs).result)
+            fig, (ax1, ax2) = plt.subplots(nrows=2)
+            df.abs().plot(ax=ax1, loglog=True)
+            df.apply(np.angle).apply(np.rad2deg).plot(ax=ax2, logx=True)
+        elif arg == "tran":
+            tstep = float(args.popleft())
+            tstop = float(args.popleft())
+            tstart = float(args.popleft())
+            vecs = take_args(args)
+            df = readAll(res.commands.tran(tstep, tstop, tstart, vectors=vecs).result)
+            df.plot()
+        elif arg == "run":
+            vecs = take_args(args)
+            df = readAll(res.commands.run(vectors=vecs).result)
+            df.plot()
+        else:
+            print(usage)
+            raise RuntimeError(arg)
 
     plt.show()
