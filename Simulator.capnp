@@ -38,6 +38,7 @@ struct Vector {
     data :union {
         real @1 :List(Float64);
         complex @2 :List(Complex);
+        digital @3 :List(Bool); # actually packed as 1 bit, cool
     }
 }
 
@@ -57,3 +58,5 @@ interface Xyce extends(Simulator(Run)) { }
 
 interface NgspiceCommands extends(Run, Tran, Op, Ac) {}
 interface Ngspice extends(Simulator(NgspiceCommands)) { }
+
+interface Cxxrtl extends(Simulator(Run)) { }

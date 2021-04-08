@@ -7,7 +7,7 @@ import pandas as pd
 def loadFiles(sim, *names):
     data = []
     for name in names:
-        with open(name) as f:
+        with open(name, 'rb') as f:
             data.append({
                 "name": name,
                 "contents": f.read()
@@ -28,6 +28,8 @@ def readAll(result):
             elif vec.data.which() == 'complex':
                 cdata = map_complex(vec.data)
                 data.setdefault(vec.name, []).extend(cdata)
+            elif vec.data.which() == 'digital':
+                data.setdefault(vec.name, []).extend(vec.data.digital)
             else:
                 raise TypeError(vec.data.which())
 
@@ -43,7 +45,7 @@ def readAll(result):
 
 def take_args(q):
     res = []
-    while q and q[0] not in {'ngspice', 'xyce', 'op', 'ac', 'tran', 'run'}:
+    while q and q[0] not in {'ngspice', 'xyce', 'cxxrtl', 'op', 'ac', 'tran', 'run'}:
         res.append(q.popleft())
     return res
 
@@ -60,14 +62,19 @@ if __name__ == "__main__":
 
         if arg == "ngspice":
             host = args.popleft()
-            file = args.popleft()
+            files = take_args(args)
             sim = capnp.TwoPartyClient(host).bootstrap().cast_as(api.Ngspice)
-            res = loadFiles(sim, file)
+            res = loadFiles(sim, *files)
         elif arg == "xyce":
             host = args.popleft()
-            file = args.popleft()
+            files = take_args(args)
             sim = capnp.TwoPartyClient(host).bootstrap().cast_as(api.Xyce)
-            res = loadFiles(sim, file)
+            res = loadFiles(sim, *files)
+        elif arg == "cxxrtl":
+            host = args.popleft()
+            files = take_args(args)
+            sim = capnp.TwoPartyClient(host).bootstrap().cast_as(api.Cxxrtl)
+            res = loadFiles(sim, *files)
         elif arg == "op":
             df = readAll(res.commands.op().result)
             print(df)
@@ -90,7 +97,7 @@ if __name__ == "__main__":
         elif arg == "run":
             vecs = take_args(args)
             df = readAll(res.commands.run(vectors=vecs).result)
-            df.plot()
+            (df*1).plot(subplots=True)
         else:
             print(usage)
             raise RuntimeError(arg)
