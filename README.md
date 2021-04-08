@@ -29,9 +29,10 @@ Current implementations:
 
 * [Xyce](https://github.com/NyanCAD/XyceSimServer)
 * [Ngspice](https://github.com/NyanCAD/NgspiceSimServer)
+* [cxxrtl](https://github.com/NyanCAD/CxxrtlSimServer)
 
 Desired:
 
 * [JuliaSpice](https://juliacomputing.com/media/2021/03/darpa-ditto/)
 * WRSpice, Qucs, Gnucap?
-* cxxrtl, verilator?
+* ghdl, verilator?
