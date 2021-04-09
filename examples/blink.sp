@@ -7,9 +7,21 @@
 Xb1 vdd 0 clk led blink
 Vdd vdd 0 1.8
 Vin clk 0 PULSE(0 1.8 0 1n 1n 1u 2u)
-.tran 1u 1m
+.tran 1u 2m
 
 .subckt blink vdd gnd clk led 
+.ic v(counter[0])=0
+.ic v(counter[1])=0
+.ic v(counter[2])=0
+.ic v(counter[3])=0
+.ic v(counter[4])=0
+.ic v(counter[5])=0
+.ic v(counter[6])=0
+.ic v(counter[7])=0
+.ic v(counter[8])=0
+.ic v(counter[9])=0
+.ic v(counter[10])=0
+.ic v(counter[11])=0
 XINVX1_1 counter[0] _0_[0] vdd gnd INVX1
 XAND2X2_1 vdd gnd counter[0] counter[1] _1_ AND2X2
 XNOR2X1_1 vdd counter[1] gnd _2_ counter[0] NOR2X1
