@@ -4,7 +4,7 @@
 #include <arpa/inet.h> // sockaddr_in, AF_INET, SOCK_STREAM, INADDR_ANY, socket etc...
 #include <string.h>    // memset
 
-#include "Simulator.capnp.h"
+#include "api/Simulator.capnp.h"
 #include <kj/debug.h>
 #include <kj/filesystem.h>
 #include <kj/exception.h>
