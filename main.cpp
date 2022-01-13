@@ -25,7 +25,7 @@ public:
         for (Sim::File::Reader f : files)
         {
             kj::Path path = kj::Path::parse(f.getName());
-            kj::Own<const kj::File> file = dir.openFile(path, kj::WriteMode::CREATE | kj::WriteMode::MODIFY);
+            kj::Own<const kj::File> file = dir.openFile(path, kj::WriteMode::CREATE | kj::WriteMode::MODIFY | kj::WriteMode::CREATE_PARENT);
             file->truncate(0);
             file->write(0, f.getContents());
         }
