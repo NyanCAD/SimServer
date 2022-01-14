@@ -4,8 +4,10 @@
 
 #if defined WIN32
 #include <winsock.h>
+typedef int socklen_t;
 #else
 #define closesocket close
+typedef int SOCKET;
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
@@ -61,7 +63,7 @@ int main(int argc, char const *argv[])
 	}
     #endif
 
-    int serverFd, clientFd;
+    SOCKET serverFd, clientFd;
     struct sockaddr_in server, client;
     socklen_t len;
     int port = 5923;
@@ -99,7 +101,11 @@ int main(int argc, char const *argv[])
             perror("accept error");
             exit(4);
         }
+        #if defined WIN32
+        int pid = 0; // yolo no forking for you
+        #else
         pid_t pid = fork();
+        #endif
         if (pid < 0) {
             perror("fork error");
             exit(4);
@@ -117,7 +123,7 @@ int main(int argc, char const *argv[])
             return 0;
         }
     }
-    close(serverFd);
+    closesocket(serverFd);
     #if defined WIN32
 	WSACleanup();
     #endif
