@@ -1,6 +1,18 @@
+#define NOMINMAX
+
 #include <stdio.h>     // perror, printf
 #include <stdlib.h>    // exit, atoi
 #include <string.h>    // memset
+
+#include "api/Simulator.capnp.h"
+#include <kj/debug.h>
+#include <kj/filesystem.h>
+#include <kj/exception.h>
+#include <kj/async-io.h>
+#include <capnp/message.h>
+#include <capnp/rpc-twoparty.h>
+
+#include "../simserver.h"
 
 #if defined WIN32
 #include <winsock.h>
@@ -12,16 +24,6 @@ typedef int SOCKET;
 #include <arpa/inet.h>
 #include <unistd.h>
 #endif
-
-#include "api/Simulator.capnp.h"
-#include <kj/debug.h>
-#include <kj/filesystem.h>
-#include <kj/exception.h>
-#include <kj/async-io.h>
-#include <capnp/message.h>
-#include <capnp/rpc-twoparty.h>
-
-#include "../simserver.h"
 
 # pragma comment(lib,"ws2_32.lib") //Winsock Library
 
