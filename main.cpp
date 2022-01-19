@@ -70,7 +70,10 @@ int main(int argc, char const *argv[])
     socklen_t len;
     int port = 5923;
     char buffer[1024];
-    if (argc == 2)
+    if (argc == 2 && strcmp(argv[1], "--help")==0) {
+        printf("%s [port]\n", argv[0]);
+        return 0;
+    } else if (argc == 2)
     {
         port = atoi(argv[1]);
     }
@@ -94,6 +97,7 @@ int main(int argc, char const *argv[])
         perror("Listen error");
         exit(3);
     }
+    printf("listening on port %d\n", port);
     while (1)
     {
         len = sizeof(client);
@@ -122,7 +126,9 @@ int main(int argc, char const *argv[])
             auto rpc = capnp::makeRpcServer(network, kj::heap<SimulatorImpl>(dir));
             network.onDisconnect().wait(ctx.waitScope);
             printf("Client disconnected: %s:%d\n", client_ip, ntohs(client.sin_port));
+            #if !defined WIN32
             return 0;
+            #endif
         }
     }
     closesocket(serverFd);
