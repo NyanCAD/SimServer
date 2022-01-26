@@ -56,11 +56,12 @@ public:
 
     const kj::Directory &dir;
 };
-
+#if !defined WIN32
 void handler(int sig) {
     int ret;
     wait(&ret);
 }
+#endif
 
 int main(int argc, char const *argv[])
 {
