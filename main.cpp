@@ -23,6 +23,9 @@ typedef int SOCKET;
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+
+#include <signal.h>
+#include <sys/wait.h>
 #endif
 
 # pragma comment(lib,"ws2_32.lib") //Winsock Library
@@ -54,6 +57,11 @@ public:
     const kj::Directory &dir;
 };
 
+void handler(int sig) {
+    int ret;
+    wait(&ret);
+}
+
 int main(int argc, char const *argv[])
 {
     #if defined WIN32
@@ -63,6 +71,8 @@ int main(int argc, char const *argv[])
 		printf("error at WSASturtup\n");
 		return 0;
 	}
+    #else
+    signal(SIGCHLD, handler);
     #endif
 
     SOCKET serverFd, clientFd;
