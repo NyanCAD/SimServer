@@ -45,7 +45,7 @@ public:
 
 using boost::this_process::native_handle_type;
 
-int runchild(native_handle_type fd) {
+int runchild(kj::LowLevelAsyncIoProvider::Fd fd) {
     kj::AsyncIoContext ctx = kj::setupAsyncIo();
     auto stream = ctx.lowLevelProvider->wrapSocketFd(fd);
     auto network = capnp::TwoPartyVatNetwork(*stream, capnp::rpc::twoparty::Side::SERVER);
@@ -67,7 +67,7 @@ int main(int argc, char const *argv[])
         printf("%s [port]\n", argv[0]);
         return 0;
     } else if (argc == 3 && strcmp(argv[1], "--child")==0) {
-        native_handle_type fd = std::stoi(argv[2]);
+        kj::LowLevelAsyncIoProvider::Fd fd = std::stoi(argv[2]);
         return runchild(fd);
     } else if (argc == 2)
     {
@@ -82,7 +82,7 @@ int main(int argc, char const *argv[])
         acceptor.accept(peersocket);
         auto endpoint = peersocket.remote_endpoint();
         printf("Accepted new connection from a client %s:%d\n", endpoint.address(), endpoint.port());
-        std::string fd = std::to_string(peersocket.native_handle());
+        std::string fd = std::to_string(peersocket.release());
         boost::process::spawn(argv[0], "--child", fd);
     }
     return 0;
