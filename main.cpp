@@ -15,6 +15,7 @@
 #include <boost/asio.hpp>
 #include <boost/process.hpp>
 #include <boost/process/handles.hpp>
+#include <boost/process/extend.hpp>
 
 class SimulatorImpl final : public Sim::Simulator<SimCommands>::Server
 {
@@ -59,6 +60,24 @@ int runchild(kj::LowLevelAsyncIoProvider::Fd fd) {
 
 using namespace boost::asio;
 using ip::tcp;
+using namespace boost::process;
+namespace ex = boost::process::extend;
+
+struct do_inherit : boost::process::extend::handler
+{
+    template<typename Char, typename Sequence>
+    void on_setup(ex::windows_executor<Char, Sequence> & exec)
+    {
+        std::cout << "windows setup" << std::endl;
+        exec.inherit_handles = 1;
+    }
+
+    template<typename Sequence>
+    void on_setup(ex::posix_executor<Sequence> & exec)
+    {
+        std::cout << "unix setup" << std::endl;
+    }
+};
 
 int main(int argc, char const *argv[])
 {
@@ -83,7 +102,7 @@ int main(int argc, char const *argv[])
         auto endpoint = peersocket.remote_endpoint();
         printf("Accepted new connection from a client %s:%d\n", endpoint.address(), endpoint.port());
         std::string fd = std::to_string(peersocket.release());
-        boost::process::spawn(argv[0], "--child", fd);
+        boost::process::spawn(argv[0], "--child", fd, do_inherit());
     }
     return 0;
 }
