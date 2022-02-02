@@ -1,5 +1,3 @@
-#include <stdio.h>     // printf
-
 #include <string> 
 
 #include "api/Simulator.capnp.h"
@@ -54,7 +52,7 @@ int runchild(kj::LowLevelAsyncIoProvider::Fd fd) {
     const kj::Directory &dir = fs->getCurrent();
     auto rpc = capnp::makeRpcServer(network, kj::heap<SimulatorImpl>(dir));
     network.onDisconnect().wait(ctx.waitScope);
-    printf("Client disconnected\n");
+    std::cout << "Client disconnected" << std::endl;
     return 0;
 }
 
@@ -83,7 +81,7 @@ int main(int argc, char const *argv[])
 {
     int port = 5923;
     if (argc == 2 && strcmp(argv[1], "--help")==0) {
-        printf("%s [port]\n", argv[0]);
+        std::cout << argv[0] << " [port]" << std::endl;
         return 0;
     } else if (argc == 3 && strcmp(argv[1], "--child")==0) {
         kj::LowLevelAsyncIoProvider::Fd fd = std::stoi(argv[2]);
@@ -96,11 +94,11 @@ int main(int argc, char const *argv[])
     tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v6(), port));
     while (1)
     {
-        printf("waiting for clients\n");
+        std::cout << "waiting for clients" << std::endl;
         tcp::socket peersocket(io_service);
         acceptor.accept(peersocket);
         auto endpoint = peersocket.remote_endpoint();
-        printf("Accepted new connection from a client %s:%d\n", endpoint.address(), endpoint.port());
+        std::cout << "Accepted new connection from a client" << endpoint.address() << ":" << endpoint.port() << std::endl;
         std::string fd = std::to_string(peersocket.release());
         boost::process::spawn(argv[0], "--child", fd, do_inherit());
     }
