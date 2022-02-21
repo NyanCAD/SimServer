@@ -108,7 +108,7 @@ int main(int argc, char const *argv[])
         acceptor.accept(peersocket);
         auto endpoint = peersocket.remote_endpoint();
         std::cout << "Accepted new connection from a client" << endpoint.address() << ":" << endpoint.port() << std::endl;
-        std::string fd = std::to_string(peersocket.release());
+        std::string fd = std::to_string(peersocket.native_handle());
         boost::process::spawn(argv[0], "--child", fd, do_inherit());
     }
     return 0;
