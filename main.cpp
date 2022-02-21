@@ -12,6 +12,7 @@
 
 #include <boost/asio.hpp>
 #include <boost/process.hpp>
+#include <boost/dll.hpp>
 #include <boost/process/handles.hpp>
 #include <boost/process/extend.hpp>
 
@@ -99,6 +100,7 @@ int main(int argc, char const *argv[])
     {
         port = std::stoi(argv[1]);
     }
+    boost::filesystem::path p = boost::dll::program_location();
     boost::asio::io_service io_service;
     tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v6(), port));
     while (1)
@@ -109,7 +111,7 @@ int main(int argc, char const *argv[])
         auto endpoint = peersocket.remote_endpoint();
         std::cout << "Accepted new connection from a client" << endpoint.address() << ":" << endpoint.port() << std::endl;
         std::string fd = std::to_string(peersocket.native_handle());
-        boost::process::spawn(argv[0], "--child", fd, do_inherit());
+        boost::process::spawn(p, "--child", fd, do_inherit());
     }
     return 0;
 }
