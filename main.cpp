@@ -93,23 +93,26 @@ struct do_inherit : boost::process::extend::handler
 
 int main(int argc, char const *argv[])
 {
+    std::string host = "::1";
     int port = 5923;
     if (argc == 2 && strcmp(argv[1], "--help")==0) {
-        std::cout << argv[0] << " [port]" << std::endl;
+        std::cout << argv[0] << " [host] [port]" << std::endl;
         return 0;
     } else if (argc == 3 && strcmp(argv[1], "--child")==0) {
         kj::LowLevelAsyncIoProvider::Fd fd = std::stoi(argv[2]);
         return runchild(fd);
-    } else if (argc == 2)
-    {
+    } else if (argc == 2) {
         port = std::stoi(argv[1]);
+    } else if (argc == 3) {
+        host = argv[1];
+        port = std::stoi(argv[2]);
     }
     boost::filesystem::path p = boost::dll::program_location();
     boost::asio::io_service io_service;
-    tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v6(), port));
+    tcp::acceptor acceptor(io_service, tcp::endpoint(boost::asio::ip::address::from_string(host), port));
     while (1)
     {
-        std::cout << "waiting for clients" << std::endl;
+        std::cout << "waiting for clients on " << host << ":" << port << std::endl;
         tcp::socket peersocket(io_service);
         acceptor.accept(peersocket);
         auto endpoint = peersocket.remote_endpoint();
